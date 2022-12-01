@@ -1,9 +1,34 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
-import './App.css'
+import { Model } from './model/model';
+import axios from "axios";
+
+let instance = axios.create({
+  baseURL: 'https://qsnf3fzubl.execute-api.us-east-1.amazonaws.com/Prod/'
+});
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [model, setModel] = React.useState(new Model());
+  const [redraw, forceRedraw] = React.useState(0);       // used to conveniently request redraw after model change
+
+  /** Ensures initial rendering is performed, and that whenever model changes, it is re-rendered. */
+  React.useEffect (() => {
+
+    // do something
+    // updateConstants()
+    // document.getElementById("guessedLetter").focus()
+  }, [model, redraw])
+
+  const registerDesigner = (email) => {
+    instance.post('/registerdesigner', {
+        "email" : email
+    }).then((response) => {
+      model.registerDesigner(response.email);
+      forceRedraw(redraw+1);
+    });
+
+    console.log(model.designers);
+  }
 
   return (
     <div className="App">
@@ -17,7 +42,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => registerDesigner('test')}>
           count is {count}
         </button>
         <p>
